@@ -1,0 +1,288 @@
+c1000v-intervwan#sh run
+Building configuration...
+
+Current configuration : 5404 bytes
+!
+! Last configuration change at 01:47:00 UTC Wed Sep 2 2020 by liang
+!
+version 16.9
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+platform qfp utilization monitor load 80
+no platform punt-keepalive disable-kernel-core
+platform console serial
+!
+hostname c1000v-intervwan
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition GS
+ rd 100:100
+ !
+ address-family ipv4
+ exit-address-family
+!
+logging persistent size 1000000 filesize 8192 immediate
+!
+aaa new-model
+!
+!
+aaa authentication login default local
+aaa authorization exec default local none 
+!
+!
+!
+!
+!
+aaa session-id common
+!
+!
+!
+!
+!
+!
+!
+ip domain name c1000v-intervwan.cloudapp.net
+!
+!
+!
+login on-success log
+!
+!
+!         
+!
+!
+!
+!
+subscriber templating
+! 
+! 
+! 
+! 
+!
+multilink bundle-name authenticated
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+no license smart enable
+diagnostic bootup level minimal
+!
+spanning-tree extend system-id
+!
+!
+!
+username liang privilege 15
+!
+redundancy
+!
+crypto ikev2 proposal azure-proposal 
+ encryption aes-cbc-256 aes-cbc-128 3des
+ integrity sha1
+ group 2
+crypto ikev2 proposal azure-proposalB 
+ ! Proposal Incomplete(MUST have atleast an encryption algorithm, an integrity algorithm and a dh group configured)
+!
+crypto ikev2 policy azure-policy 
+ proposal azure-proposal
+crypto ikev2 policy azure-policyB 
+ ! Policy Incomplete(MUST have atleast one complete proposal attached)
+!
+crypto ikev2 keyring azure-keyring
+ peer 1.1.1.1
+  address 1.1.1.1
+  pre-shared-key keykey
+ !
+ peer 2.2.2.2
+  address 2.2.2.2
+  pre-shared-key keykey
+ !
+ peer 3.3.3.3
+  address 3.3.3.3
+  pre-shared-key keykey
+ !
+ peer 4.4.4.4
+  address 4.4.4.4
+  pre-shared-key keykey
+ !
+!
+!
+crypto ikev2 profile azure-profile
+ match address local interface GigabitEthernet1
+ match identity remote address 1.1.1.1 255.255.255.255 
+ match identity remote address 2.2.2.2 255.255.255.255 
+ match identity remote address 3.3.3.3 255.255.255.255 
+ match identity remote address 4.4.4.4 255.255.255.255 
+ authentication remote pre-share
+ authentication local pre-share
+ keyring local azure-keyring
+ dpd 10 2 periodic
+!
+!
+!
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+crypto ipsec transform-set azure-ipsec-proposal-set esp-aes 256 esp-sha-hmac 
+ mode tunnel
+!
+crypto ipsec profile azure-vti
+ set transform-set azure-ipsec-proposal-set 
+ set ikev2-profile azure-profile
+!
+!
+!
+!
+!
+!
+!         
+! 
+!
+!
+interface Loopback4
+ ip address 10.171.1.1 255.255.255.255
+!
+interface Loopback101
+ ip address 10.100.101.1 255.255.255.0
+!
+interface Tunnel1
+ ip address 169.254.171.1 255.255.255.0
+ ip tcp adjust-mss 1350
+ tunnel source GigabitEthernet1
+ tunnel mode ipsec ipv4
+ tunnel destination 1.1.1.1
+ tunnel protection ipsec profile azure-vti
+!
+interface Tunnel2
+ ip address 169.254.172.1 255.255.255.0
+ ip tcp adjust-mss 1350
+ tunnel source GigabitEthernet1
+ tunnel mode ipsec ipv4
+ tunnel destination 2.2.2.2
+ tunnel protection ipsec profile azure-vti
+!
+interface Tunnel3
+ description tovWANglobaleastushub
+ ip address 169.254.173.1 255.255.255.0
+ ip tcp adjust-mss 1350
+ tunnel source GigabitEthernet1
+ tunnel mode ipsec ipv4
+ tunnel destination 3.3.3.3
+ tunnel protection ipsec profile azure-vti
+!
+interface Tunnel4
+ description tovWANglobaleastushub
+ ip address 169.254.174.1 255.255.255.0
+ ip tcp adjust-mss 1350
+ tunnel source GigabitEthernet1
+ tunnel mode ipsec ipv4
+ tunnel destination 4.4.4.4
+ tunnel protection ipsec profile azure-vti
+!
+interface GigabitEthernet1
+ ip address dhcp
+ negotiation auto
+ no mop enabled
+ no mop sysid
+!
+router bgp 4
+ bgp log-neighbor-changes
+ neighbor 10.166.3.12 remote-as 65515
+ neighbor 10.166.3.12 ebgp-multihop 5
+ neighbor 10.166.3.12 update-source Loopback4
+ neighbor 10.166.3.13 remote-as 65515
+ neighbor 10.166.3.13 ebgp-multihop 5
+ neighbor 10.166.3.13 update-source Loopback4
+ neighbor 10.167.1.12 remote-as 65515
+ neighbor 10.167.1.12 ebgp-multihop 5
+ neighbor 10.167.1.12 update-source Loopback4
+ neighbor 10.167.1.13 remote-as 65515
+ neighbor 10.167.1.13 ebgp-multihop 5
+ neighbor 10.167.1.13 update-source Loopback4
+ !
+ address-family ipv4
+  network 10.100.101.0 mask 255.255.255.0
+  network 10.100.101.1
+  neighbor 10.166.3.12 activate
+  neighbor 10.166.3.12 as-override
+  neighbor 10.166.3.13 activate
+  neighbor 10.166.3.13 as-override
+  neighbor 10.167.1.12 activate
+  neighbor 10.167.1.12 as-override
+  neighbor 10.167.1.13 activate
+  neighbor 10.167.1.13 as-override
+  maximum-paths 4
+ exit-address-family
+!
+ip forward-protocol nd
+no ip http server
+ip http secure-server
+ip route 10.166.3.12 255.255.255.255 Tunnel3
+ip route 10.166.3.13 255.255.255.255 Tunnel4
+ip route 10.167.1.12 255.255.255.255 Tunnel2
+ip route 10.167.1.13 255.255.255.255 Tunnel1
+!
+ip as-path access-list 100 deny ^65515.*
+ip as-path access-list 100 permit .*
+ip ssh rsa keypair-name sshkeys
+ip ssh pubkey-chain
+  username liang
+   key-hash ssh-rsa 39BAABB8F5FA1B44FD995C09CB012B66
+!
+!
+!
+route-map addaspath permit 20 
+ match as-path 100
+ set as-path prepend 41 42 43
+!
+!
+!
+!
+!
+control-plane
+!
+!
+!
+!
+!
+!
+line con 0
+ stopbits 1
+line aux 0
+ stopbits 1
+line vty 0 4
+ exec-timeout 60 0
+ length 0
+ transport input ssh
+line vty 5 20
+ exec-timeout 60 0
+ length 0
+ transport input ssh
+!
+!
+!
+!
+!
+!
+end
+
+c1000v-intervwan#  
