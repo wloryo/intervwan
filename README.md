@@ -65,12 +65,15 @@ router bgp 4
 
 ### Routing tables
 1. vwan yosemite - vhub westus
+
 <img src="/3.png" width="100%">
 
 2. vwan global - vhub eastus
+
 <img src="/4.png" width="100%">
 
 3. c1000v
+
 Filtered some routes which are not related to the testing.
 
 ```
@@ -99,12 +102,17 @@ C        10.171.1.1/32 is directly connected, Loopback4
 
 ### Connectbility test
 VNET to VNET
+
 1. vwan yosemite westus -> vwan global east us
+
 <img src="/6.1.png" width="40%">
+
 2. vwan yosemite eastus -> vwan global east us
+
 <img src="/6.2.png" width="40%">
 
 VNET to Branch
+
 3. vwan yosemite westus -> vwan global VPN East Asia
 
 <img src="/6.3.png" width="40%">
