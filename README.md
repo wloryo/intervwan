@@ -1,6 +1,6 @@
 # How to interconnect multiple Virtual Wan
 
-Thank you Daniel Mauser's post to start the discussion about how to connect multiple virtual wan.
+Thanks Daniel Mauser's post to start the discussion about how to connect multiple virtual wan.
 https://github.com/dmauser/Lab/tree/master/VWAN/Multi-vWAN-Dev-Prod
 
 This article is a PoC for that article and use a "all in Azure" approach to connect multiple virtual wan.
@@ -9,14 +9,17 @@ This article is a PoC for that article and use a "all in Azure" approach to conn
 Azure Virtual WAN is a networking service that brings many networking, security, and routing functionalities together to provide a single operational interface. 
 There are some scenarios may need to interconnect multiple virtual wan into one routing domain.
 1. More branches or vnet need to be added to the virtual wan.
-Resource	Limit
-- Virtual WAN hubs per region:	1
-- VPN (branch) connections per hub:	1,000
-- VNet connections per hub:	500 minus total number of hubs in Virtual WAN
+
+Resource	Limit (202009)
+ - Virtual WAN hubs per region:	1
+ - VPN (branch) connections per hub:	1,000
+ - VNet connections per hub:	500 minus total number of hubs in Virtual WAN
+
 2. There are multiple virtual wan is created by different organizations and need to be connected together.
 
 ## The Lab
 ### Network Diagram
+
 We have 2 virtual wan used in the testing.
 - vwan global
 - vwan yosemite
@@ -24,9 +27,10 @@ We have 2 virtual wan used in the testing.
 <img src="/1.png" width="70%">
 
 ### Solution Highlight
+
 highlight for this solution
 - Use cisco 1000v as the NVA within the a VNET to interconnect 2 virtual wan
-- Use bgp as override feature to override the virtual wan 65515 AS as a local AS number (which is 4 in this article)
+- Use bgp AS override feature to override the virtual wan 65515 AS number as a local AS number (which is 4 in this article)
 
 Cisco c1000v BGP settings
 ```
@@ -102,20 +106,16 @@ VNET to VNET
 
 VNET to Branch
 3. vwan yosemite westus -> vwan global VPN East Asia
+
 <img src="/6.3.png" width="40%">
 
 Connectability for both vwan is confirmed depend on the those ping test.
 
 ## Challenges
-1. There is a concern for the increasing latency (up to 350ms from eastus to eastus) for test #2. 
+1. The increasing latency (up to 350ms from eastus to eastus) for test #2. 
 Due to packet flow through a hairpin likely pass which increase the latency.
 
 <img src="/5.png" width="60%">
-
-There is one non-validated idea to improve the latency here is to use multiple c1000v to aggregate each pair region's vHub traffic only.
-But this will need to do the route fillter on each c1000v and will increase the complex for the operation.
-e.g.  vwan yosemite eastus -> C1000v@eastus -> vwan global eastus
-vwan yosemite westus -> C1000v@westus -> vwan global westus
 
 2. The c1000v is connected to both virtual wan as a "VPN site" which support up to 1 gbps throughput.
 This is a bandwidth over subscription design in the normal case.
