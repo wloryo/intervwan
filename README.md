@@ -121,7 +121,7 @@ Connectability for both vwan is confirmed depend on the those ping test.
 
 ## Challenges
 1. The increasing latency (up to 350ms from eastus to eastus) for test #2. 
-Due to packet flow through a hairpin likely pass which increase the latency.
+Due to packet flow through a hairpin likely path which increase the latency.
 
 <img src="/5.png" width="60%">
 
