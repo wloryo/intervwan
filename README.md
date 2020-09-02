@@ -1,4 +1,4 @@
-# How to interconnect multiple Virtual Wan by using cisco csr1000v
+# How to interconnect multiple Virtual Wan by using cisco virtual router c1000v
 
 Thanks Daniel Mauser's [post](https://github.com/dmauser/Lab/tree/master/VWAN/Multi-vWAN-Dev-Prod) to start the discussion about how to connect multiple virtual wan.
 
