@@ -1,7 +1,7 @@
 # How to interconnect multiple Virtual Wan
 
-Thanks Daniel Mauser's post to start the discussion about how to connect multiple virtual wan.
-https://github.com/dmauser/Lab/tree/master/VWAN/Multi-vWAN-Dev-Prod
+Thanks Daniel Mauser's [post](https://github.com/dmauser/Lab/tree/master/VWAN/Multi-vWAN-Dev-Prod) to start the discussion about how to connect multiple virtual wan.
+
 
 This article is a PoC for that article and use a "all in Azure" approach to connect multiple virtual wan.
 
@@ -24,7 +24,7 @@ We have 2 virtual wan used in the testing.
 - vwan global
 - vwan yosemite
 
-<img src="/1.png" width="70%">
+<img src="/1.png" width="90%">
 
 ### Solution Highlight
 
